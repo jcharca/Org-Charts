@@ -286,7 +286,7 @@ function buildFilters(region) {
       <span class="lbl">Level ${depth} &mdash; ${levelLabel(depth)}</span>`;
     sec.appendChild(hdr);
 
-    Object.keys(counts).sort().forEach(g => {
+    Object.keys(counts).sort((a, b) => (counts[b] - counts[a]) || a.localeCompare(b)).forEach(g => {
       if (defOn(depth, g)) set.add(g);
       const label = document.createElement('label');
       label.className = 'filter-row' + (set.has(g) ? ' checked' : '');
