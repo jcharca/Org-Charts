@@ -3,101 +3,196 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Regional Org Charts — RVP View</title>
+<title>Org Chart Builder — RVP Regions</title>
 <style>
-  :root{
-    --rvp:#1f3a5f; --l2:#2e7d9a; --l3:#5a9e6f; --bg:#f4f6f9;
-    --line:#b9c2cd; --ink:#1c2733; --muted:#67727e; --panel:#fff;
-  }
-  *{box-sizing:border-box}
-  body{margin:0;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--ink);}
-  header{background:var(--rvp);color:#fff;padding:14px 20px;display:flex;align-items:center;gap:24px;flex-wrap:wrap;}
-  header h1{font-size:18px;margin:0;font-weight:600;letter-spacing:.3px;}
-  header .src{font-size:12px;color:#c5d3e3;}
-  .controls{display:flex;gap:22px;align-items:flex-start;flex-wrap:wrap;}
-  .ctl label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:#c5d3e3;margin-bottom:4px;}
-  select{font-size:15px;padding:7px 10px;border-radius:6px;border:1px solid #cbd5e1;min-width:220px;}
-  .layout{display:flex;align-items:stretch;min-height:calc(100vh - 60px);}
-  .filters{width:250px;flex:none;background:var(--panel);border-right:1px solid var(--line);padding:16px;overflow:auto;}
-  .filters h3{font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin:18px 0 8px;}
-  .filters h3:first-child{margin-top:0;}
-  .fgroup{font-size:13px;}
-  .fgroup .row{display:flex;align-items:center;gap:7px;padding:3px 0;cursor:pointer;}
-  .fgroup .row input{cursor:pointer;}
-  .fgroup .count{margin-left:auto;color:var(--muted);font-size:11px;}
-  .fbtns{display:flex;gap:6px;margin:6px 0 2px;}
-  .fbtns button{font-size:11px;padding:3px 8px;border:1px solid #cbd5e1;background:#fff;border-radius:5px;cursor:pointer;}
-  .fbtns button:hover{background:#eef2f7;}
-  .chart{flex:1;overflow:auto;padding:28px 24px;}
-  .sidebar{width:330px;flex:none;background:var(--panel);border-left:1px solid var(--line);padding:16px;overflow:auto;}
-  .sidebar h3{font-size:13px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin:0 0 4px;}
-  .sidebar .hint{font-size:11px;color:var(--muted);margin-bottom:12px;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:#f0f2f5;color:#1a2332;display:flex;flex-direction:column;height:100vh;overflow:hidden}
 
-  /* chart nodes */
-  .tree{display:flex;flex-direction:column;align-items:center;min-width:max-content;}
-  .node{border-radius:9px;color:#fff;padding:9px 14px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.18);max-width:230px;}
-  .node .nm{font-weight:600;font-size:14px;line-height:1.2;}
-  .node .tt{font-size:11.5px;opacity:.92;margin-top:2px;line-height:1.25;}
-  .node .loc{font-size:10px;opacity:.8;margin-top:3px;}
-  .rvp{background:var(--rvp);}
-  .l2{background:var(--l2);}
-  .l3{background:var(--l3);color:#fff;padding:7px 11px;max-width:200px;}
-  .l3 .nm{font-size:12.5px;} .l3 .tt{font-size:10.5px;}
+/* ── App shell ── */
+.app-header{background:#14202f;color:#fff;padding:14px 20px;flex:none;display:flex;align-items:center;gap:6px}
+.app-header .brand{font-size:15px;font-weight:700;letter-spacing:-.2px}
+.app-header .sub{font-size:11px;color:#8a9bb0;margin-top:1px}
+.app-body{flex:1;display:flex;overflow:hidden}
 
-  .vline{width:2px;height:22px;background:var(--line);}
-  .row2{display:flex;align-items:flex-start;gap:26px;justify-content:center;}
-  .branch{display:flex;flex-direction:column;align-items:center;}
-  .l3wrap{display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:10px;}
-  .l3wrap.empty{display:none;}
-  .l3count{font-size:10px;color:var(--muted);margin-top:6px;}
-  .hconn{height:2px;background:var(--line);}
-  .topconn{display:flex;justify-content:center;}
+/* ── Left sidebar ── */
+.sidebar-left{width:230px;flex:none;background:#14202f;color:#c8d6e5;display:flex;flex-direction:column;overflow-y:auto}
+.sl-section{padding:14px 16px}
+.sl-section+.sl-section{border-top:1px solid #243040}
+.sl-label{font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:#5a7a96;margin-bottom:7px;font-weight:600}
+.sl-select{width:100%;font-size:13px;padding:7px 9px;border-radius:6px;border:1px solid #2e4258;background:#1c2f44;color:#e2ecf6;outline:none;cursor:pointer}
+.sl-select:focus{border-color:#3d7fbf}
+.sl-level-hdr{display:flex;align-items:center;gap:6px;margin-bottom:9px}
+.sl-level-hdr .dot{width:8px;height:8px;border-radius:50%;flex:none}
+.dot-l1{background:#2d9cdb}
+.dot-l2{background:#27ae60}
+.sl-level-hdr .lbl{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:#8ab6d8}
+.filter-row{display:flex;align-items:center;gap:8px;padding:3px 0;cursor:pointer;font-size:12.5px;color:#b0c8dc;line-height:1.3}
+.filter-row input[type=checkbox]{cursor:pointer;accent-color:#2d9cdb;width:13px;height:13px;flex:none}
+.filter-row.checked{color:#e2ecf6}
+.filter-count{margin-left:auto;font-size:11px;color:#506070;background:#1c2f44;border-radius:10px;padding:1px 7px;flex:none}
+.fbtns{display:flex;gap:6px;margin:4px 0 10px}
+.fbtns button{font-size:11px;padding:3px 10px;border:1px solid #2e4258;background:transparent;color:#7a9bb5;border-radius:4px;cursor:pointer;letter-spacing:.2px}
+.fbtns button:hover{background:#1c2f44;color:#c8d6e5}
 
-  /* sidebar chain */
-  .chain{font-size:13px;}
-  .chain .lvl1{margin:10px 0 4px;font-weight:700;color:var(--rvp);}
-  .chain .lvl2{margin:8px 0 2px 4px;font-weight:600;color:var(--l2);border-left:3px solid var(--l2);padding-left:8px;}
-  .chain .lvl3{margin:1px 0 1px 22px;color:var(--ink);padding-left:8px;border-left:2px solid #d4dde6;}
-  .chain .t{color:var(--muted);font-size:11px;}
-  .chain .badge{display:inline-block;background:#eef2f7;color:var(--muted);font-size:10px;border-radius:4px;padding:0 5px;margin-left:4px;}
-  .summary{font-size:12px;color:var(--muted);background:#f7f9fb;border:1px solid #e6ecf2;border-radius:6px;padding:8px 10px;margin-bottom:12px;}
-  .empty-msg{color:var(--muted);font-style:italic;padding:20px;}
-  @media print{.filters,.sidebar,header .controls{display:none}}
+/* ── Main chart area ── */
+.chart-area{flex:1;overflow:auto;display:flex;flex-direction:column;min-width:0}
+.chart-hdr{flex:none;padding:18px 24px 14px;background:#f0f2f5;border-bottom:1px solid #d8dde6;display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.chart-hdr .region-name{font-size:22px;font-weight:700;color:#1a2332;letter-spacing:-.3px}
+.chart-hdr .rvp-chip{font-size:13px;color:#2d7cbf;font-weight:500}
+.chart-hdr .rvp-chip span{font-weight:400;color:#7a8fa0}
+.chart-hdr .counts{font-size:12.5px;color:#7a8fa0;margin-left:auto}
+.chart-hdr .counts b{color:#1a2332}
+.chart-scroll{flex:1;overflow:auto;padding:28px 28px 40px}
+
+/* ── Tree layout ── */
+.tree{display:flex;flex-direction:column;align-items:center;min-width:max-content}
+.vline{width:2px;height:24px;background:#c8d0da;flex:none}
+.row2{display:flex;align-items:flex-start;gap:20px;justify-content:center}
+.branch{display:flex;flex-direction:column;align-items:center}
+.l3wrap{display:flex;flex-direction:column;align-items:stretch;gap:7px;margin-top:8px;width:100%}
+.l3-more{font-size:11px;color:#9aabb8;text-align:center;margin-top:4px;font-style:italic}
+.empty-msg{color:#9aabb8;font-style:italic;padding:32px 20px;font-size:14px}
+
+/* ── Node cards ── */
+.card{border-radius:10px;text-align:left;position:relative;width:195px}
+
+/* RVP */
+.card.rvp-card{background:#1a2e4a;color:#fff;padding:14px 16px 12px;text-align:center;width:240px;box-shadow:0 2px 8px rgba(0,0,0,.22)}
+.card.rvp-card .cn{font-size:16px;font-weight:700;letter-spacing:-.2px}
+.card.rvp-card .ct{font-size:12px;color:#95b4cc;margin-top:3px}
+.card.rvp-card .badge-rvp{display:inline-block;margin-top:8px;background:#2d4a6a;color:#7fb3d8;font-size:10px;font-weight:700;letter-spacing:.8px;padding:3px 9px;border-radius:20px;text-transform:uppercase}
+
+/* L1 director */
+.card.l1-card{background:#1d6fa4;color:#fff;padding:12px 14px 10px;box-shadow:0 2px 6px rgba(0,0,0,.18)}
+.card.l1-card .cn{font-size:13.5px;font-weight:700;letter-spacing:-.1px}
+.card.l1-card .ct{font-size:11px;color:#b8d9f0;margin-top:2px;line-height:1.3}
+.card.l1-card .role-badge{display:inline-block;margin-top:7px;font-size:9.5px;font-weight:700;letter-spacing:.5px;padding:2px 8px;border-radius:12px;text-transform:uppercase}
+
+/* L2 person */
+.card.l2-card{background:#fff;color:#1a2332;padding:10px 13px 9px;box-shadow:0 1px 4px rgba(0,0,0,.1);border:1px solid #e0e6ec}
+.card.l2-card .cn{font-size:12.5px;font-weight:600;letter-spacing:-.1px}
+.card.l2-card .ct{font-size:11px;color:#607080;margin-top:2px;line-height:1.3}
+.card.l2-card .role-badge{display:inline-block;margin-top:7px;font-size:9.5px;font-weight:700;letter-spacing:.5px;padding:2px 8px;border-radius:12px;text-transform:uppercase}
+
+/* role badge colors */
+.rb-dir-ops{background:#e8f4fb;color:#1a6fa8}
+.rb-dir-pa{background:#e6f7ee;color:#1a7a45}
+.rb-dir-other{background:#ebe6fa;color:#5a3ab0}
+.rb-pa{background:#e6f7ee;color:#1a7a45}
+.rb-mgr{background:#fff4e0;color:#8a5a00}
+.rb-sup{background:#fef0e0;color:#9a5000}
+.rb-other{background:#f0f2f5;color:#5a6a7a}
+.rb-rvp{background:#d4e8f7;color:#1a5580}
+.rb-nm{background:#fde8f5;color:#8a1a6a}
+
+/* L1 card badge colors (on dark bg) */
+.l1-card .rb-dir-ops{background:rgba(45,140,220,.25);color:#b8e0ff}
+.l1-card .rb-dir-pa{background:rgba(39,174,96,.25);color:#a8f0c0}
+.l1-card .rb-dir-other{background:rgba(120,80,210,.25);color:#d0b8ff}
+.l1-card .rb-pa{background:rgba(39,174,96,.25);color:#a8f0c0}
+.l1-card .rb-mgr{background:rgba(200,130,0,.2);color:#ffd080}
+.l1-card .rb-sup{background:rgba(200,100,0,.2);color:#ffb870}
+.l1-card .rb-rvp{background:rgba(100,180,255,.2);color:#90d0ff}
+.l1-card .rb-other{background:rgba(255,255,255,.12);color:#c0d4e4}
+.l1-card .rb-nm{background:rgba(220,80,180,.2);color:#ffb8e8}
+
+/* ── Right sidebar ── */
+.sidebar-right{width:310px;flex:none;background:#fff;border-left:1px solid #dde3ec;display:flex;flex-direction:column;overflow:hidden}
+.sr-hdr{padding:14px 16px 8px;border-bottom:1px solid #eaeff5}
+.sr-hdr h2{font-size:12px;text-transform:uppercase;letter-spacing:.7px;color:#5a6a7a;font-weight:700}
+.sr-scroll{flex:1;overflow-y:auto;padding:10px 16px 0}
+.sr-footer{padding:12px 16px;border-top:1px solid #eaeff5;flex:none}
+.copy-btn{width:100%;padding:10px;background:#1a2e4a;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;letter-spacing:.2px}
+.copy-btn:hover{background:#1d3a5c}
+.copy-btn:active{background:#0f1e30}
+
+/* chain of command in sidebar */
+.chain-group{margin-bottom:16px}
+.chain-group-hdr{display:flex;align-items:center;gap:6px;margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid #eaeff5}
+.chain-group-hdr .dot{width:7px;height:7px;border-radius:50%;flex:none}
+.chain-group-hdr .glbl{font-size:9.5px;text-transform:uppercase;letter-spacing:.7px;font-weight:700;color:#8a9bb0}
+.chain-group-hdr .gcount{font-size:10px;color:#aab5c0;margin-left:auto}
+.chain-l1{padding:5px 0 3px}
+.chain-l1 .name{font-size:13px;font-weight:600;color:#1a2332}
+.chain-l1 .title{font-size:11px;color:#5a6a7a;margin-top:1px}
+.chain-l1 .path{font-size:10px;color:#96a8b5;margin-top:1px}
+.chain-l2{padding:4px 0 2px 12px;border-left:2px solid #d4dde6;margin-left:4px}
+.chain-l2 .name{font-size:12.5px;font-weight:600;color:#1a2332}
+.chain-l2 .title{font-size:11px;color:#5a6a7a;margin-top:1px}
+.chain-l2 .path{font-size:10px;color:#96a8b5;margin-top:1px}
+
+/* chain section header for L1 role groups */
+.chain-sec-hdr{font-size:10px;text-transform:uppercase;letter-spacing:.7px;font-weight:700;color:#2d7cbf;border-top:2px solid #2d7cbf;padding-top:6px;margin:10px 0 6px}
+
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-thumb{background:#c8d0da;border-radius:3px}
+::-webkit-scrollbar-track{background:transparent}
 </style>
 </head>
 <body>
-<header>
+
+<header class="app-header">
   <div>
-    <h1>Regional Org Charts</h1>
-    <div class="src">RVP-level view · active employees</div>
-  </div>
-  <div class="controls">
-    <div class="ctl">
-      <label for="region">Region (RVP)</label>
-      <select id="region"></select>
-    </div>
+    <div class="brand">Org Chart Builder</div>
+    <div class="sub">RVP regions &middot; role-filtered hierarchy</div>
   </div>
 </header>
 
-<div class="layout">
-  <aside class="filters">
-    <h3>Direct Reports (Level 2)</h3>
-    <div class="fbtns"><button data-lvl="2" data-act="all">All</button><button data-lvl="2" data-act="none">None</button></div>
-    <div class="fgroup" id="filter2"></div>
+<div class="app-body">
 
-    <h3>Their Reports (Level 3)</h3>
-    <div class="fbtns"><button data-lvl="3" data-act="all">All</button><button data-lvl="3" data-act="none">None</button></div>
-    <div class="fgroup" id="filter3"></div>
+  <!-- Left sidebar -->
+  <aside class="sidebar-left">
+    <div class="sl-section">
+      <div class="sl-label">Region</div>
+      <select class="sl-select" id="region"></select>
+    </div>
+
+    <div class="sl-section">
+      <div class="sl-level-hdr">
+        <span class="dot dot-l1"></span>
+        <span class="lbl">Level 1 &mdash; Direct reports to RVP</span>
+      </div>
+      <div class="fgroup" id="filter2"></div>
+      <div class="fbtns">
+        <button data-lvl="2" data-act="all">All</button>
+        <button data-lvl="2" data-act="none">None</button>
+      </div>
+    </div>
+
+    <div class="sl-section">
+      <div class="sl-level-hdr">
+        <span class="dot dot-l2"></span>
+        <span class="lbl">Level 2 &mdash; Reports to directors</span>
+      </div>
+      <div class="fgroup" id="filter3"></div>
+      <div class="fbtns">
+        <button data-lvl="3" data-act="all">All</button>
+        <button data-lvl="3" data-act="none">None</button>
+      </div>
+    </div>
   </aside>
 
-  <main class="chart" id="chart"></main>
+  <!-- Main chart -->
+  <div class="chart-area">
+    <div class="chart-hdr" id="chart-hdr">
+      <span class="region-name" id="hdr-region">—</span>
+      <span class="rvp-chip"><span>RVP </span><span id="hdr-rvp">—</span></span>
+      <span class="counts" id="hdr-counts"></span>
+    </div>
+    <div class="chart-scroll">
+      <div class="tree" id="chart"></div>
+    </div>
+  </div>
 
-  <aside class="sidebar">
-    <h3>Chain of Command</h3>
-    <div class="hint">Names & titles currently shown, in reporting order.</div>
-    <div class="summary" id="summary"></div>
-    <div class="chain" id="chain"></div>
+  <!-- Right sidebar -->
+  <aside class="sidebar-right">
+    <div class="sr-hdr"><h2>Chain of Command</h2></div>
+    <div class="sr-scroll" id="chain"></div>
+    <div class="sr-footer">
+      <button class="copy-btn" id="copy-btn">Copy roster to clipboard</button>
+    </div>
   </aside>
+
 </div>
 
 <script id="data" type="application/json">{
@@ -8108,126 +8203,252 @@
 <script>
 const DATA = JSON.parse(document.getElementById('data').textContent);
 const regionSel = document.getElementById('region');
-const state = { region:null, show2:new Set(), show3:new Set() };
+const state = { region: null, show2: new Set(), show3: new Set() };
+
+// role → badge class
+function badgeClass(group) {
+  const m = {
+    'Director of Operations': 'rb-dir-ops',
+    'Director, Practice Administration': 'rb-dir-pa',
+    'Director (Other)': 'rb-dir-other',
+    'Practice Administrator': 'rb-pa',
+    'Manager': 'rb-mgr',
+    'Nursing Manager': 'rb-nm',
+    'Supervisor': 'rb-sup',
+    'RVP / Regional VP': 'rb-rvp',
+  };
+  return m[group] || 'rb-other';
+}
+
+function shortGroup(group) {
+  const m = {
+    'Director of Operations': 'Director of Operations',
+    'Director, Practice Administration': 'Director, Practice Admin',
+    'Director (Other)': 'Director',
+    'Practice Administrator': 'Practice Administrator',
+    'Manager': 'Manager',
+    'Nursing Manager': 'Nursing Manager',
+    'Supervisor': 'Supervisor',
+    'RVP / Regional VP': 'RVP',
+    'Physician': 'Physician',
+    'Advanced Provider (APRN/NP/PA)': 'Advanced Provider / APRN / PA',
+    'Clinical / Medical Assistant': 'Medical Assistant',
+    'Administrative / Support': 'Admin Support',
+  };
+  return m[group] || group;
+}
+
+function esc(s) {
+  return (s == null ? '' : String(s)).replace(/[&<>"]/g, c =>
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])
+  );
+}
 
 // populate regions
-Object.keys(DATA.regions).forEach(r=>{
-  const o=document.createElement('option'); o.value=r;
-  const rvp=DATA.regions[r];
-  o.textContent = `${r} — ${rvp.name}`;
+Object.keys(DATA.regions).forEach(r => {
+  const o = document.createElement('option');
+  o.value = r;
+  const rvp = DATA.regions[r];
+  o.textContent = `${r} (${rvp.name})`;
   regionSel.appendChild(o);
 });
 
-function groupCounts(region){
-  const rvp=DATA.regions[region];
-  const c2={}, c3={};
-  rvp.reports.forEach(d=>{
-    c2[d.group]=(c2[d.group]||0)+1;
-    (d.reports||[]).forEach(s=>{ c3[s.group]=(c3[s.group]||0)+1; });
+function groupCounts(region) {
+  const rvp = DATA.regions[region];
+  const c2 = {}, c3 = {};
+  rvp.reports.forEach(d => {
+    c2[d.group] = (c2[d.group] || 0) + 1;
+    (d.reports || []).forEach(s => { c3[s.group] = (c3[s.group] || 0) + 1; });
   });
-  return {c2,c3};
+  return { c2, c3 };
 }
 
-function buildFilters(region){
-  const {c2,c3}=groupCounts(region);
-  // sensible defaults: level2 -> leadership roles on; level3 -> practice admin focus on
+function buildFilters(region) {
+  const { c2, c3 } = groupCounts(region);
   const def2on = g => /Director|Practice Administrator|Manager|Supervisor/.test(g);
   const def3on = g => /Practice Administrator|Director|Manager|Supervisor/.test(g);
-  function render(containerId, counts, defOn, target){
-    const el=document.getElementById(containerId); el.innerHTML='';
+
+  function render(containerId, counts, defOn, target) {
+    const el = document.getElementById(containerId);
+    el.innerHTML = '';
     target.clear();
-    Object.keys(counts).sort().forEach(g=>{
-      if(defOn(g)) target.add(g);
-      const row=document.createElement('label'); row.className='row';
-      const cb=document.createElement('input'); cb.type='checkbox'; cb.checked=target.has(g); cb.value=g;
-      cb.addEventListener('change',()=>{ cb.checked?target.add(g):target.delete(g); draw(); });
-      const span=document.createElement('span'); span.textContent=g;
-      const cnt=document.createElement('span'); cnt.className='count'; cnt.textContent=counts[g];
-      row.append(cb,span,cnt); el.appendChild(row);
+    Object.keys(counts).sort().forEach(g => {
+      if (defOn(g)) target.add(g);
+      const label = document.createElement('label');
+      label.className = 'filter-row' + (target.has(g) ? ' checked' : '');
+      const cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.checked = target.has(g);
+      cb.value = g;
+      cb.addEventListener('change', () => {
+        if (cb.checked) { target.add(g); label.classList.add('checked'); }
+        else { target.delete(g); label.classList.remove('checked'); }
+        draw();
+      });
+      const span = document.createElement('span');
+      span.textContent = shortGroup(g);
+      const cnt = document.createElement('span');
+      cnt.className = 'filter-count';
+      cnt.textContent = counts[g];
+      label.append(cb, span, cnt);
+      el.appendChild(label);
     });
   }
-  render('filter2',c2,def2on,state.show2);
-  render('filter3',c3,def3on,state.show3);
+  render('filter2', c2, def2on, state.show2);
+  render('filter3', c3, def3on, state.show3);
 }
 
-document.querySelectorAll('.fbtns button').forEach(b=>{
-  b.addEventListener('click',()=>{
-    const lvl=b.dataset.lvl, act=b.dataset.act;
-    const target=lvl==='2'?state.show2:state.show3;
-    const counts=groupCounts(state.region)[lvl==='2'?'c2':'c3'];
+document.querySelectorAll('.fbtns button').forEach(b => {
+  b.addEventListener('click', () => {
+    const lvl = b.dataset.lvl, act = b.dataset.act;
+    const target = lvl === '2' ? state.show2 : state.show3;
+    const counts = groupCounts(state.region)[lvl === '2' ? 'c2' : 'c3'];
     target.clear();
-    if(act==='all') Object.keys(counts).forEach(g=>target.add(g));
-    document.querySelectorAll('#filter'+lvl+' input').forEach(cb=>cb.checked=target.has(cb.value));
+    if (act === 'all') Object.keys(counts).forEach(g => target.add(g));
+    const containerId = 'filter' + lvl;
+    document.querySelectorAll('#' + containerId + ' input').forEach(cb => {
+      cb.checked = target.has(cb.value);
+      cb.closest('label').classList.toggle('checked', cb.checked);
+    });
     draw();
   });
 });
 
-function nodeEl(p, cls){
-  const d=document.createElement('div'); d.className='node '+cls;
-  d.innerHTML=`<div class="nm">${esc(p.name)}</div><div class="tt">${esc(p.title||'')}</div>`+
-    (p.city?`<div class="loc">${esc(p.city)}${p.state?', '+esc(p.state):''}</div>`:'');
-  return d;
+function makeCard(p, level) {
+  const card = document.createElement('div');
+  card.className = `card ${level === 'rvp' ? 'rvp-card' : level === 'l1' ? 'l1-card' : 'l2-card'}`;
+
+  if (level === 'rvp') {
+    card.innerHTML = `<div class="cn">${esc(p.name)}</div>
+      <div class="ct">${esc(p.title || '')}</div>
+      <div><span class="badge-rvp">RVP &middot; ${esc(state.region)}</span></div>`;
+  } else {
+    const bc = badgeClass(p.group);
+    const loc = p.city ? `<div class="ct" style="margin-top:2px;font-size:10px;opacity:.75">${esc(p.city)}${p.state ? ', ' + esc(p.state) : ''}</div>` : '';
+    card.innerHTML = `<div class="cn">${esc(p.name)}</div>
+      <div class="ct">${esc(p.title || '')}</div>
+      ${loc}
+      <div style="margin-top:6px"><span class="role-badge ${bc}">${esc(shortGroup(p.group))}</span></div>`;
+  }
+  return card;
 }
-function esc(s){return (s==null?'':String(s)).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
 
-function draw(){
-  const region=state.region; const rvp=DATA.regions[region];
-  const chart=document.getElementById('chart'); chart.innerHTML='';
-  const tree=document.createElement('div'); tree.className='tree';
-  tree.appendChild(nodeEl(rvp,'rvp'));
+function draw() {
+  const region = state.region;
+  const rvp = DATA.regions[region];
+  const chart = document.getElementById('chart');
+  chart.innerHTML = '';
 
-  const directs=rvp.reports.filter(d=>state.show2.has(d.group));
-  if(directs.length){
-    const v=document.createElement('div'); v.className='vline'; tree.appendChild(v);
-    const row=document.createElement('div'); row.className='row2';
-    directs.forEach(d=>{
-      const branch=document.createElement('div'); branch.className='branch';
-      branch.appendChild(nodeEl(d,'l2'));
-      const subs=(d.reports||[]).filter(s=>state.show3.has(s.group));
-      if(subs.length){
-        const v2=document.createElement('div'); v2.className='vline'; branch.appendChild(v2);
-        const wrap=document.createElement('div'); wrap.className='l3wrap';
-        subs.forEach(s=>wrap.appendChild(nodeEl(s,'l3')));
+  const directs = rvp.reports.filter(d => state.show2.has(d.group));
+  let total2 = 0, total3 = 0;
+
+  // RVP node
+  chart.appendChild(makeCard(rvp, 'rvp'));
+
+  if (directs.length) {
+    const vl = document.createElement('div'); vl.className = 'vline'; chart.appendChild(vl);
+    const row = document.createElement('div'); row.className = 'row2';
+    directs.forEach(d => {
+      total2++;
+      const branch = document.createElement('div'); branch.className = 'branch';
+      branch.appendChild(makeCard(d, 'l1'));
+      const subs = (d.reports || []).filter(s => state.show3.has(s.group));
+      if (subs.length) {
+        const vl2 = document.createElement('div'); vl2.className = 'vline'; branch.appendChild(vl2);
+        const wrap = document.createElement('div'); wrap.className = 'l3wrap';
+        subs.forEach(s => { total3++; wrap.appendChild(makeCard(s, 'l2')); });
         branch.appendChild(wrap);
       }
-      const hidden=(d.reports||[]).length-subs.length;
-      if(hidden>0){const c=document.createElement('div');c.className='l3count';c.textContent=`+${hidden} hidden`;branch.appendChild(c);}
+      const hidden = (d.reports || []).length - subs.length;
+      if (hidden > 0) {
+        const more = document.createElement('div'); more.className = 'l3-more';
+        more.textContent = `+${hidden} not shown`; branch.appendChild(more);
+      }
       row.appendChild(branch);
     });
-    tree.appendChild(row);
+    chart.appendChild(row);
   } else {
-    const m=document.createElement('div'); m.className='empty-msg'; m.textContent='No direct-report roles selected.'; tree.appendChild(m);
+    const m = document.createElement('div'); m.className = 'empty-msg';
+    m.textContent = 'No Level 1 roles selected.'; chart.appendChild(m);
   }
-  chart.appendChild(tree);
-  drawChain(rvp,directs);
+
+  // header counts
+  document.getElementById('hdr-region').textContent = region;
+  document.getElementById('hdr-rvp').textContent = rvp.name;
+  document.getElementById('hdr-counts').innerHTML =
+    `<b>${total2}</b> shown at L1 &middot; <b>${total3}</b> shown at L2`;
+
+  drawChain(rvp, directs);
 }
 
-function drawChain(rvp,directs){
-  const chain=document.getElementById('chain'); chain.innerHTML='';
-  let n2=0,n3=0;
-  const top=document.createElement('div'); top.className='lvl1';
-  top.innerHTML=`${esc(rvp.name)} <span class="t">— ${esc(rvp.title)}</span>`;
-  chain.appendChild(top);
-  directs.forEach(d=>{
-    n2++;
-    const a=document.createElement('div'); a.className='lvl2';
-    a.innerHTML=`${esc(d.name)} <span class="t">— ${esc(d.title)}</span>`;
-    chain.appendChild(a);
-    (d.reports||[]).filter(s=>state.show3.has(s.group)).forEach(s=>{
-      n3++;
-      const b=document.createElement('div'); b.className='lvl3';
-      b.innerHTML=`${esc(s.name)} <span class="t">— ${esc(s.title)}</span>`;
-      chain.appendChild(b);
+function drawChain(rvp, directs) {
+  const el = document.getElementById('chain');
+  el.innerHTML = '';
+
+  // Group by L1 role group
+  const groups = {};
+  directs.forEach(d => {
+    if (!groups[d.group]) groups[d.group] = [];
+    groups[d.group].push(d);
+  });
+
+  const rvpPath = esc(rvp.name);
+
+  Object.keys(groups).sort().forEach(gname => {
+    const members = groups[gname];
+    // section header
+    const hdr = document.createElement('div');
+    hdr.className = 'chain-sec-hdr';
+    hdr.textContent = shortGroup(gname).toUpperCase();
+    el.appendChild(hdr);
+
+    members.forEach(d => {
+      const dPath = rvpPath + ' › ' + esc(d.name);
+      // L1 row
+      const l1 = document.createElement('div'); l1.className = 'chain-l1';
+      l1.innerHTML = `<div class="name">${esc(d.name)}</div>
+        <div class="title">${esc(d.title || '')}</div>
+        <div class="path">${rvpPath} › ${esc(d.name)}</div>`;
+      el.appendChild(l1);
+
+      (d.reports || []).filter(s => state.show3.has(s.group)).forEach(s => {
+        const l2 = document.createElement('div'); l2.className = 'chain-l2';
+        l2.innerHTML = `<div class="name">${esc(s.name)}</div>
+          <div class="title">${esc(s.title || '')}</div>
+          <div class="path">${dPath} › ${esc(s.name)}</div>`;
+        el.appendChild(l2);
+      });
     });
   });
-  document.getElementById('summary').innerHTML =
-    `<b>${esc(state.region)}</b> region<br>${n2} direct report${n2!==1?'s':''} shown · ${n3} second-level shown · ${n2+n3+1} total`;
 }
 
-regionSel.addEventListener('change',()=>{ state.region=regionSel.value; buildFilters(state.region); draw(); });
+// Copy roster to clipboard
+document.getElementById('copy-btn').addEventListener('click', () => {
+  const region = state.region;
+  const rvp = DATA.regions[region];
+  const directs = rvp.reports.filter(d => state.show2.has(d.group));
+  const lines = [`${rvp.name} — ${rvp.title} (RVP, ${region})`];
+  directs.forEach(d => {
+    lines.push(`  ${d.name} — ${d.title || ''}`);
+    (d.reports || []).filter(s => state.show3.has(s.group)).forEach(s => {
+      lines.push(`    ${s.name} — ${s.title || ''}`);
+    });
+  });
+  navigator.clipboard.writeText(lines.join('\n')).then(() => {
+    const btn = document.getElementById('copy-btn');
+    btn.textContent = 'Copied!';
+    setTimeout(() => { btn.textContent = 'Copy roster to clipboard'; }, 2000);
+  });
+});
+
+regionSel.addEventListener('change', () => {
+  state.region = regionSel.value;
+  buildFilters(state.region);
+  draw();
+});
 
 // init
-state.region=regionSel.value=Object.keys(DATA.regions)[0];
+state.region = regionSel.value = Object.keys(DATA.regions)[0];
 buildFilters(state.region);
 draw();
 </script>
