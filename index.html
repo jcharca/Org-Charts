@@ -133,6 +133,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Ar
 ::-webkit-scrollbar{width:6px;height:6px}
 ::-webkit-scrollbar-thumb{background:#c8d0da;border-radius:3px}
 ::-webkit-scrollbar-track{background:transparent}
+
+/* ── panel collapse ── */
+.sidebar-left,.sidebar-right{transition:width .18s ease}
+.sidebar-left.collapsed,.sidebar-right.collapsed{width:0;min-width:0;padding:0;border:none;overflow:hidden}
+.hdr-toggles{margin-left:auto;display:flex;gap:8px}
+.toggle-btn{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:6px 12px;border:1px solid #35465a;background:#1c2f44;color:#c8d6e5;border-radius:6px;cursor:pointer;letter-spacing:.2px}
+.toggle-btn:hover{background:#26405c;color:#fff}
+.toggle-btn.off{background:transparent;color:#7a93aa}
 </style>
 </head>
 <body>
@@ -141,6 +149,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Ar
   <div>
     <div class="brand">Org Chart Builder</div>
     <div class="sub">RVP regions &middot; role-filtered hierarchy</div>
+  </div>
+  <div class="hdr-toggles">
+    <button class="toggle-btn" id="toggle-left" title="Show/hide the filters panel">&#9776; Filters</button>
+    <button class="toggle-btn" id="toggle-right" title="Show/hide the chain of command panel">&#9776; Chain of Command</button>
   </div>
 </header>
 
@@ -480,6 +492,18 @@ regionSel.addEventListener('change', () => {
   buildFilters(state.region);
   draw();
 });
+
+// ── collapse / expand side panels ───────────────────────────────
+function wireToggle(btnId, panelSel) {
+  const btn = document.getElementById(btnId);
+  const panel = document.querySelector(panelSel);
+  btn.addEventListener('click', () => {
+    const collapsed = panel.classList.toggle('collapsed');
+    btn.classList.toggle('off', collapsed);
+  });
+}
+wireToggle('toggle-left', '.sidebar-left');
+wireToggle('toggle-right', '.sidebar-right');
 
 // init
 state.region = regionSel.value = Object.keys(DATA.regions)[0];
